@@ -1,0 +1,400 @@
+<style>
+.wj { font-family: var(--font-anthropic-sans); display: flex; flex-direction: column; gap: var(--cds-gap-lg); max-width: 1280px; margin-inline: auto; }
+.wj-head { display: flex; flex-direction: column; gap: var(--cds-gap-xs); }
+.wj-title { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; text-wrap: balance; }
+.wj-take { color: var(--color-fg-muted); font-size: var(--cds-font-size-body); margin: 0; max-width: 70ch; }
+.wj-take b { font-weight: 600; color: var(--color-fg); }
+.wj-meta { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.wj-meta a { color: inherit; }
+.wj-bar { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm); align-items: center; }
+.wj-bar-label { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-right: var(--cds-gap-xs); }
+.wj-chip { font: inherit; font-size: var(--cds-font-size-caption); padding: 4px 12px; border-radius: 999px; border: 1px solid var(--color-border-line); background: var(--color-panel); color: var(--color-fg); cursor: pointer; }
+.wj-chip[aria-pressed="true"] { background: var(--color-fg); color: var(--color-bg); border-color: var(--color-fg); }
+.wj-chip:focus-visible, .wj-th:focus-visible, .wj-search:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
+.wj-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)); gap: var(--cds-gap-md); }
+.wj-kpi { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-md) var(--cds-pad-lg); display: flex; flex-direction: column; gap: var(--cds-gap-xs); min-width: 0; }
+.wj-kpi-label { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.wj-kpi-val { font-family: var(--font-anthropic-serif); font-size: var(--cds-font-size-title); font-variant-numeric: tabular-nums; line-height: 1.1; min-height: 1.1em; }
+.wj-kpi-note { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.wj-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: var(--cds-gap-md); }
+.wj-card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: flex; flex-direction: column; gap: var(--cds-gap-sm); min-width: 0; position: relative; }
+.wj-card.wide { grid-column: 1 / -1; }
+.wj-h { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0; }
+.wj-note { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin: 0; }
+.wj-legend { display: flex; gap: var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); flex-wrap: wrap; }
+.wj-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.wj-bars { display: flex; flex-direction: column; gap: 6px; min-height: 120px; }
+.wj-row { display: grid; grid-template-columns: minmax(6rem, 11rem) 1fr; gap: var(--cds-gap-sm); align-items: center; font-size: var(--cds-font-size-caption); }
+.wj-row-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wj-track { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.wj-line { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.wj-fill { height: 12px; border-radius: 0 4px 4px 0; min-width: 2px; }
+.wj-fill.thin { height: 7px; }
+.wj-val { color: var(--color-fg-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.wj-tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); z-index: 5; max-width: 16rem; }
+.wj-tip .t { color: var(--cds-text-secondary); margin-bottom: 2px; }
+.wj-search { font: inherit; font-size: var(--cds-font-size-body); padding: 6px 10px; border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); background: var(--color-bg); color: var(--color-fg); width: min(100%, 22rem); }
+.wj-split { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: var(--cds-gap-md); }
+@media (max-width: 900px) { .wj-split { grid-template-columns: 1fr; } }
+.wj-tablebox { max-height: 34rem; overflow: auto; border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); }
+.wj-table { width: 100%; border-collapse: collapse; font-size: var(--cds-font-size-caption); }
+.wj-table th { position: sticky; top: 0; background: var(--color-panel); text-align: left; font-weight: var(--cds-font-weight-medium); border-bottom: 1px solid var(--color-border-line); padding: 0; z-index: 1; }
+.wj-th { font: inherit; background: none; border: 0; color: inherit; padding: 8px 10px; cursor: pointer; width: 100%; text-align: left; white-space: nowrap; }
+.wj-table td { padding: 7px 10px; border-bottom: 1px solid var(--color-border-line); vertical-align: top; }
+.wj-table tbody tr { cursor: pointer; }
+.wj-table tbody tr:hover { background: color-mix(in srgb, var(--color-fg) 5%, transparent); }
+.wj-table tbody tr.sel { background: color-mix(in srgb, var(--color-fg) 9%, transparent); }
+.wj-table .kw { color: var(--color-fg-muted); }
+@media (max-width: 640px) { .wj-hide-sm { display: none; } }
+.wj-detail { display: flex; flex-direction: column; gap: var(--cds-gap-sm); min-width: 0; max-height: 34rem; overflow: auto; }
+.wj-detail h4 { margin: var(--cds-gap-sm) 0 0; font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); }
+.wj-pre { white-space: pre-wrap; font-size: var(--cds-font-size-caption); line-height: 1.6; margin: 0; overflow-wrap: anywhere; }
+.wj-dpos { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); }
+.wj-dpos a { color: inherit; }
+[data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+[data-dash-source-state=empty] { color: transparent; }
+</style>
+
+<div class="wj">
+  <header class="wj-head">
+    <h1 class="wj-title" id="top">임베디드·하드웨어 채용 요건</h1>
+    <p class="wj-take dash-skeleton" id="take">—</p>
+    <div class="wj-meta">원티드 개발 직군 › 임베디드 개발자 · 하드웨어 엔지니어, 인기순 전체 공고 (2026-10-12 수집) · 키워드는 자격요건/우대사항 문장에서 사전 기반으로 추출</div>
+  </header>
+
+  <div class="wj-bar" role="group" aria-label="직무 범위">
+    <span class="wj-bar-label">직무 범위</span>
+    <button class="wj-chip" data-scope="전체" aria-pressed="true">전체</button>
+    <button class="wj-chip" data-scope="임베디드 계열" aria-pressed="false">임베디드 계열</button>
+    <button class="wj-chip" data-scope="하드웨어 계열" aria-pressed="false">하드웨어 계열</button>
+  </div>
+
+  <section class="wj-kpis" id="kpis">
+    <div class="wj-kpi"><span class="wj-kpi-label">공고 수</span><span class="wj-kpi-val dash-skeleton" data-source="summary" data-field="postings">—</span><span class="wj-kpi-note">현재 범위</span></div>
+    <div class="wj-kpi"><span class="wj-kpi-label">채용 기업</span><span class="wj-kpi-val dash-skeleton" data-source="summary" data-field="companies">—</span><span class="wj-kpi-note">중복 제외</span></div>
+    <div class="wj-kpi"><span class="wj-kpi-label">신입 지원 가능</span><span class="wj-kpi-val dash-skeleton" data-source="summary" data-field="newbie_share">—</span><span class="wj-kpi-note">최소 경력 0년 공고 비율</span></div>
+    <div class="wj-kpi"><span class="wj-kpi-label">최소 경력 중앙값</span><span class="wj-kpi-val dash-skeleton" data-source="summary" data-field="median_exp">—</span><span class="wj-kpi-note">년</span></div>
+    <div class="wj-kpi"><span class="wj-kpi-label">학위 요건 명시</span><span class="wj-kpi-val dash-skeleton" data-source="summary" data-field="degree_share">—</span><span class="wj-kpi-note">학사·석사·박사·전공 언급</span></div>
+    <div class="wj-kpi"><span class="wj-kpi-label">수도권 근무</span><span class="wj-kpi-val dash-skeleton" data-source="summary" data-field="capital_share">—</span><span class="wj-kpi-note">서울·경기·인천</span></div>
+  </section>
+
+  <section class="wj-grid">
+    <div class="wj-card wide" id="kw-card">
+      <h2 class="wj-h">요건 키워드 Top 20</h2>
+      <p class="wj-note">각 키워드를 언급한 공고 비율. 자격요건(필수)과 우대사항을 나눠 셉니다.</p>
+      <div class="wj-bar" role="group" aria-label="키워드 분류" id="groups"></div>
+      <div class="wj-legend" id="kw-legend"></div>
+      <div class="wj-bars dash-skeleton" id="kw-chart" data-source="kw_counts"></div>
+    </div>
+
+    <div class="wj-card" id="pref-card">
+      <h2 class="wj-h">우대사항에서 더 자주 나오는 키워드</h2>
+      <p class="wj-note">우대 언급 공고 수 − 필수 언급 공고 수. 있으면 가산점이 되는 역량입니다.</p>
+      <div class="wj-bars dash-skeleton" id="gap-chart" data-source="kw_counts"></div>
+    </div>
+
+    <div class="wj-card" id="skill-card">
+      <h2 class="wj-h">원티드 기술 태그 Top 15</h2>
+      <p class="wj-note">기업이 공고에 직접 붙인 스킬 태그 기준 공고 수.</p>
+      <div class="wj-bars dash-skeleton" id="skill-chart" data-source="skill_counts"></div>
+    </div>
+
+    <div class="wj-card" id="exp-card">
+      <h2 class="wj-h">요구 경력 (최소 기준)</h2>
+      <p class="wj-note">공고에 적힌 최소 경력 연차별 공고 수.</p>
+      <div class="wj-bars dash-skeleton" id="exp-chart" data-source="dists"></div>
+    </div>
+
+    <div class="wj-card" id="deg-card">
+      <h2 class="wj-h">학력 요건</h2>
+      <p class="wj-note">자격요건 문장에 적힌 가장 높은 학위 기준.</p>
+      <div class="wj-bars dash-skeleton" id="deg-chart" data-source="dists"></div>
+    </div>
+
+    <div class="wj-card" id="loc-card">
+      <h2 class="wj-h">근무 지역</h2>
+      <p class="wj-note">회사 주소의 시·도 기준 공고 수.</p>
+      <div class="wj-bars dash-skeleton" id="loc-chart" data-source="dists"></div>
+    </div>
+  </section>
+
+  <section class="wj-card wide" id="list">
+    <h2 class="wj-h">공고별 요건 정리</h2>
+    <p class="wj-note">행을 누르면 오른쪽에 주요업무·자격요건·우대사항 원문이 열립니다. 포지션 이름은 원티드 공고로 연결됩니다.</p>
+    <input class="wj-search" id="q" type="search" placeholder="회사, 포지션, 키워드 검색 (예: RTOS, 회로설계)" aria-label="공고 검색">
+    <div class="wj-split">
+      <div class="wj-tablebox">
+        <table class="wj-table" data-source="jobs" data-row-key="id" id="tbl">
+          <thead><tr>
+            <th data-field="company"><button class="wj-th" data-k="company">회사</button></th>
+            <th data-field="position"><button class="wj-th" data-k="position">포지션</button></th>
+            <th data-field="role" class="wj-hide-sm"><button class="wj-th" data-k="role">직무</button></th>
+            <th data-field="exp_min"><button class="wj-th" data-k="exp_min">최소 경력</button></th>
+            <th data-field="degree_req" class="wj-hide-sm"><button class="wj-th" data-k="degree_req">학력</button></th>
+            <th data-field="req_kw" class="wj-hide-sm"><button class="wj-th" data-k="req_kw">필수 키워드</button></th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="wj-detail" id="detail">
+        <div class="wj-dpos"><a id="d-pos" target="_blank" rel="noopener" data-source="jobs" data-field="position">—</a></div>
+        <div class="wj-meta"><span id="d-co" data-source="jobs" data-field="company">—</span> · <span id="d-loc" data-source="jobs" data-field="location">—</span> · 경력 <span id="d-exp" data-source="jobs" data-field="exp_band">—</span></div>
+        <h4>자격요건</h4><p class="wj-pre" id="d-req" data-source="jobs" data-field="requirements">—</p>
+        <h4>우대사항</h4><p class="wj-pre" id="d-pref" data-source="jobs" data-field="preferred">—</p>
+        <h4>주요업무</h4><p class="wj-pre" id="d-task" data-source="jobs" data-field="main_tasks">—</p>
+      </div>
+    </div>
+    <p class="wj-note" id="count"></p>
+  </section>
+</div>
+
+<script>
+dash.calc('scoped', {
+  inputs: ['jobs'],
+  title: '직무 범위별 공고',
+  description: '공고마다 전체, 임베디드 계열, 하드웨어 계열 중 속하는 범위별로 한 행씩 만듭니다.',
+  fn: (jobs) => jobs.flatMap(j => ['전체']
+    .concat(j.role.includes('임베디드') ? ['임베디드 계열'] : [])
+    .concat(j.role.includes('하드웨어') ? ['하드웨어 계열'] : [])
+    .map(scope => ({scope, id: j.id, company: j.company, location: j.location, exp_min: Number(j.exp_min), exp_band: j.exp_band, degree_req: j.degree_req, req_kw: j.req_kw, pref_kw: j.pref_kw, skill_tags: j.skill_tags})))
+});
+
+dash.calc('summary', {
+  inputs: ['scoped'],
+  title: '범위별 요약 지표',
+  description: '범위별 공고 수, 기업 수, 신입 가능 비율, 최소 경력 중앙값, 학위 명시 비율, 수도권 비율.',
+  fn: (scoped) => [...new Set(scoped.map(d => d.scope))].map(scope => {
+    const js = scoped.filter(d => d.scope === scope);
+    const exp = js.map(d => d.exp_min).sort((a, b) => a - b);
+    const mid = exp.length % 2 ? exp[(exp.length - 1) / 2] : (exp[exp.length / 2 - 1] + exp[exp.length / 2]) / 2;
+    return {
+      scope, postings: js.length,
+      companies: new Set(js.map(d => d.company)).size,
+      newbie_share: js.filter(d => d.exp_min === 0).length / js.length,
+      median_exp: mid,
+      degree_share: js.filter(d => d.degree_req !== '명시 없음').length / js.length,
+      capital_share: js.filter(d => ['서울', '경기', '인천'].includes(d.location)).length / js.length
+    };
+  })
+});
+
+dash.calc('kw_counts', {
+  inputs: ['scoped', 'kwgroups'],
+  title: '요건 키워드 빈도',
+  description: '범위별로 각 키워드를 자격요건(req)·우대사항(pref)에서 언급한 공고 수와 비율.',
+  fn: (scoped, kwgroups) => [...new Set(scoped.map(d => d.scope))].flatMap(scope => {
+    const js = scoped.filter(d => d.scope === scope);
+    return kwgroups.map(k => {
+      const req = js.filter(d => d.req_kw.split('|').includes(k.keyword)).length;
+      const pref = js.filter(d => d.pref_kw.split('|').includes(k.keyword)).length;
+      return {key: scope + '|' + k.keyword, scope, keyword: k.keyword, group: k.group, req, pref, gap: pref - req, req_share: req / js.length, pref_share: pref / js.length};
+    });
+  })
+});
+
+dash.calc('skill_counts', {
+  inputs: ['scoped'],
+  title: '기술 태그 빈도',
+  description: '범위별로 원티드 스킬 태그가 붙은 공고 수.',
+  fn: (scoped) => {
+    const m = new Map();
+    for (const d of scoped) for (const s of d.skill_tags.split('|').filter(Boolean)) {
+      const k = d.scope + '|' + s;
+      m.set(k, {key: k, scope: d.scope, skill: s, n: (m.get(k)?.n || 0) + 1});
+    }
+    return [...m.values()];
+  }
+});
+
+dash.calc('dists', {
+  inputs: ['scoped'],
+  title: '경력·학력·지역 분포',
+  description: '범위별로 최소 경력 구간, 학력 요건, 근무 시·도마다 공고 수.',
+  fn: (scoped) => {
+    const m = new Map();
+    for (const d of scoped) for (const dim of ['exp_band', 'degree_req', 'location']) {
+      const k = d.scope + '|' + dim + '|' + d[dim];
+      m.set(k, {key: k, scope: d.scope, dim, value: d[dim], n: (m.get(k)?.n || 0) + 1});
+    }
+    return [...m.values()];
+  }
+});
+
+(() => {
+  const pct = d3.format('.0%');
+  const st = {scope: '전체', group: '전체', sort: {k: null, dir: 1}, q: '', sel: null};
+  const $ = (id) => document.getElementById(id);
+  const ok = (id) => dash.data(id).status === 'ok';
+  const rows = (id) => (ok(id) ? dash.data(id).data : []);
+  const enc = (v) => String(v).replace(/%/g, '%25').replace(/&/g, '%26').replace(/=/g, '%3D');
+
+  // tooltip shared by every bar chart
+  const tip = document.createElement('div');
+  tip.className = 'wj-tip'; tip.hidden = true;
+  const showTip = (card, ev, title, lines) => {
+    if (tip.parentNode !== card) card.appendChild(tip);
+    tip.replaceChildren();
+    const t = document.createElement('div'); t.className = 't'; t.textContent = title; tip.appendChild(t);
+    for (const l of lines) { const p = document.createElement('div'); p.textContent = l; tip.appendChild(p); }
+    tip.hidden = false;
+    const r = card.getBoundingClientRect();
+    let x = ev.clientX - r.left + 12, y = ev.clientY - r.top + 12;
+    x = Math.min(x, r.width - tip.offsetWidth - 8);
+    tip.style.left = Math.max(8, x) + 'px'; tip.style.top = y + 'px';
+  };
+  const hideTip = () => { tip.hidden = true; };
+
+  const failed = (el) => {
+    el.replaceChildren();
+    const s = document.createElement('div');
+    s.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:6px;min-height:120px;color:var(--color-fg-muted);font-size:var(--cds-font-size-caption)';
+    const dot = document.createElement('span');
+    dot.style.cssText = 'width:.375rem;height:.375rem;border-radius:50%;background:var(--color-bad)';
+    s.append(dot, 'Failed to load');
+    el.appendChild(s);
+  };
+
+  // series: [{field, color, thin, fmt}], items: rows; max: shared scale
+  const bars = (el, items, labelOf, series, max, tipOf) => {
+    el.replaceChildren();
+    const card = el.closest('.wj-card');
+    for (const it of items) {
+      const row = document.createElement('div'); row.className = 'wj-row';
+      const lab = document.createElement('div'); lab.className = 'wj-row-label'; lab.textContent = labelOf(it); lab.title = labelOf(it);
+      const tr = document.createElement('div'); tr.className = 'wj-track';
+      for (const s of series) {
+        const line = document.createElement('div'); line.className = 'wj-line';
+        const f = document.createElement('div'); f.className = 'wj-fill' + (s.thin ? ' thin' : '');
+        f.style.background = s.color;
+        f.style.width = `calc(${(Math.max(0, it[s.field]) / max) * 100}% * 0.82)`;
+        const v = document.createElement('span'); v.className = 'wj-val'; v.textContent = s.fmt(it);
+        line.append(f, v); tr.appendChild(line);
+      }
+      row.append(lab, tr);
+      row.addEventListener('mousemove', (ev) => { const [t, ls] = tipOf(it); showTip(card, ev, t, ls); });
+      row.addEventListener('mouseleave', hideTip);
+      el.appendChild(row);
+    }
+  };
+
+  const groups = ['전체', '언어', 'OS·플랫폼', '프로세서', '통신·인터페이스', 'HW 설계', '도구', '도메인', '기본 역량'];
+  $('groups').replaceChildren(...groups.map(g => {
+    const b = document.createElement('button'); b.className = 'wj-chip'; b.textContent = g;
+    b.setAttribute('aria-pressed', String(g === st.group));
+    b.addEventListener('click', () => { st.group = g; $('groups').querySelectorAll('.wj-chip').forEach(c => c.setAttribute('aria-pressed', String(c.textContent === g))); draw(); });
+    return b;
+  }));
+  $('kw-legend').innerHTML = '';
+  [['자격요건(필수)', dash.colors[0]], ['우대사항', dash.colors[1]]].forEach(([n, c]) => {
+    const s = document.createElement('span'); const i = document.createElement('i'); i.style.background = c; s.append(i, n); $('kw-legend').appendChild(s);
+  });
+
+  document.querySelectorAll('[data-scope]').forEach(b => b.addEventListener('click', () => {
+    st.scope = b.dataset.scope;
+    document.querySelectorAll('[data-scope]').forEach(c => c.setAttribute('aria-pressed', String(c === b)));
+    draw();
+  }));
+  $('q').addEventListener('input', (e) => { st.q = e.target.value.trim().toLowerCase(); drawTable(); });
+  document.querySelectorAll('.wj-th').forEach(b => b.addEventListener('click', () => {
+    const k = b.dataset.k;
+    st.sort = {k, dir: st.sort.k === k ? -st.sort.dir : 1};
+    document.querySelectorAll('#tbl th').forEach(th => th.removeAttribute('aria-sort'));
+    b.parentNode.setAttribute('aria-sort', st.sort.dir > 0 ? 'ascending' : 'descending');
+    drawTable();
+  }));
+
+  const drawKpis = () => {
+    const s = rows('summary').find(d => d.scope === st.scope);
+    const fmt = {postings: d3.format(','), companies: d3.format(','), newbie_share: pct, median_exp: d3.format('.1~f'), degree_share: pct, capital_share: pct};
+    document.querySelectorAll('#kpis [data-field]').forEach(el => {
+      el.setAttribute('data-where', 'scope=' + enc(st.scope));
+      if (ok('summary') || dash.data('summary').status !== 'loading') el.classList.remove('dash-skeleton');
+      el.textContent = s ? fmt[el.dataset.field](s[el.dataset.field]) : '—';
+    });
+    const take = $('take');
+    const kw = rows('kw_counts').filter(d => d.scope === st.scope).sort((a, b) => b.req - a.req);
+    if (s && kw.length) {
+      take.classList.remove('dash-skeleton');
+      take.replaceChildren();
+      const b = (txt, src, field, where) => { const e = document.createElement('b'); e.textContent = txt; e.dataset.source = src; e.dataset.field = field; e.dataset.where = where; return e; };
+      const w = 'key=' + enc(kw[0].key), w2 = 'key=' + enc(kw[1].key);
+      take.append(`${st.scope} 공고 ${s.postings}건 중 가장 많이 요구되는 필수 요건은 `, b(kw[0].keyword, 'kw_counts', 'keyword', w), ' (', b(pct(kw[0].req_share), 'kw_counts', 'req_share', w), '), 그다음이 ',
+        b(kw[1].keyword, 'kw_counts', 'keyword', w2), ' (', b(pct(kw[1].req_share), 'kw_counts', 'req_share', w2), ')입니다. 신입이 지원할 수 있는 공고는 ',
+        b(pct(s.newbie_share), 'summary', 'newbie_share', 'scope=' + enc(st.scope)), '입니다.');
+    } else if (dash.data('kw_counts').status !== 'loading') { take.classList.remove('dash-skeleton'); }
+  };
+
+  const chart = (id, src, build) => {
+    const el = $(id);
+    const s = dash.data(src).status;
+    if (s === 'ok') { el.classList.remove('dash-skeleton'); build(el); }
+    else if (s === 'error' || s === 'connect' || s === 'declined' || s === 'missing') { el.classList.remove('dash-skeleton'); failed(el); }
+  };
+
+  const drawCharts = () => {
+    chart('kw-chart', 'kw_counts', (el) => {
+      const items = rows('kw_counts').filter(d => d.scope === st.scope && (st.group === '전체' || d.group === st.group) && (d.req + d.pref) > 0)
+        .sort((a, b) => b.req_share - a.req_share || b.pref_share - a.pref_share).slice(0, 20);
+      const max = d3.max(items, d => Math.max(d.req_share, d.pref_share)) || 1;
+      bars(el, items, d => d.keyword, [
+        {field: 'req_share', color: dash.colors[0], fmt: d => `${pct(d.req_share)} · ${d.req}건`},
+        {field: 'pref_share', color: dash.colors[1], thin: true, fmt: d => `${pct(d.pref_share)} · ${d.pref}건`}
+      ], max, d => [`${d.keyword} (${d.group})`, [`자격요건 ${d.req}건 · ${pct(d.req_share)}`, `우대사항 ${d.pref}건 · ${pct(d.pref_share)}`]]);
+    });
+    chart('gap-chart', 'kw_counts', (el) => {
+      const items = rows('kw_counts').filter(d => d.scope === st.scope && d.gap > 0).sort((a, b) => b.gap - a.gap).slice(0, 10);
+      bars(el, items, d => d.keyword, [{field: 'gap', color: dash.colors[1], fmt: d => `+${d.gap}건`}], d3.max(items, d => d.gap) || 1,
+        d => [d.keyword, [`우대 ${d.pref}건 / 필수 ${d.req}건`]]);
+    });
+    chart('skill-chart', 'skill_counts', (el) => {
+      const items = rows('skill_counts').filter(d => d.scope === st.scope).sort((a, b) => b.n - a.n).slice(0, 15);
+      bars(el, items, d => d.skill, [{field: 'n', color: dash.colors[0], fmt: d => `${d.n}건`}], d3.max(items, d => d.n) || 1, d => [d.skill, [`${d.n}개 공고`]]);
+    });
+    const dist = (id, dim, order) => chart(id, 'dists', (el) => {
+      let items = rows('dists').filter(d => d.scope === st.scope && d.dim === dim);
+      items = order ? items.sort((a, b) => order.indexOf(a.value) - order.indexOf(b.value)) : items.sort((a, b) => b.n - a.n).slice(0, 8);
+      const tot = d3.sum(rows('dists').filter(d => d.scope === st.scope && d.dim === dim), d => d.n);
+      bars(el, items, d => d.value, [{field: 'n', color: dash.colors[0], fmt: d => `${d.n}건 · ${pct(d.n / tot)}`}], d3.max(items, d => d.n) || 1, d => [d.value, [`${d.n}개 공고 (${pct(d.n / tot)})`]]);
+    });
+    dist('exp-chart', 'exp_band', ['신입 가능', '1~2년', '3~4년', '5~6년', '7년 이상']);
+    dist('deg-chart', 'degree_req', ['명시 없음', '관련 전공(학위 미명시)', '초대졸 이상', '학사 이상', '석사 이상', '박사']);
+    dist('loc-chart', 'location', null);
+  };
+
+  const showDetail = (j) => {
+    st.sel = j ? j.id : null;
+    const w = j ? 'id=' + enc(j.id) : null;
+    const set = (id, v) => { const el = $(id); el.textContent = v || '—'; if (w) el.setAttribute('data-where', w); };
+    set('d-pos', j && j.position); set('d-co', j && j.company); set('d-loc', j && j.location); set('d-exp', j && j.exp_band);
+    set('d-req', j && j.requirements); set('d-pref', j && j.preferred); set('d-task', j && j.main_tasks);
+    if (j) $('d-pos').href = j.url; else $('d-pos').removeAttribute('href');
+    document.querySelectorAll('#tbody tr').forEach(tr => tr.classList.toggle('sel', j && tr.dataset.key === String(j.id)));
+  };
+
+  const drawTable = () => {
+    const tb = $('tbody');
+    if (!ok('jobs')) { tb.replaceChildren(); return; }
+    let js = rows('jobs').filter(j => st.scope === '전체' || j.role.includes(st.scope.replace(' 계열', '')));
+    if (st.q) js = js.filter(j => [j.company, j.position, j.req_kw, j.pref_kw, j.skill_tags, j.requirements].join(' ').toLowerCase().includes(st.q));
+    if (st.sort.k) {
+      const k = st.sort.k, num = k === 'exp_min';
+      js = js.slice().sort((a, b) => (num ? Number(a[k]) - Number(b[k]) : String(a[k]).localeCompare(String(b[k]), 'ko')) * st.sort.dir);
+    }
+    const frag = document.createDocumentFragment();
+    for (const j of js) {
+      const tr = document.createElement('tr'); tr.dataset.key = String(j.id);
+      const td = (v, cls) => { const c = document.createElement('td'); c.textContent = v; if (cls) c.className = cls; tr.appendChild(c); };
+      td(j.company); td(j.position); td(j.role, 'wj-hide-sm'); td(String(j.exp_min)); td(j.degree_req, 'wj-hide-sm'); td(j.req_kw, 'kw wj-hide-sm');
+      tr.addEventListener('click', () => showDetail(j));
+      frag.appendChild(tr);
+    }
+    tb.replaceChildren(frag);
+    $('count').textContent = `${js.length}건 표시`;
+    const cur = js.find(j => j.id === st.sel) || js[0];
+    showDetail(cur);
+  };
+
+  const draw = () => { drawKpis(); drawCharts(); drawTable(); };
+  dash.onData(draw);
+})();
+</script>
